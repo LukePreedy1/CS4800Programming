@@ -9,15 +9,11 @@ public class wedding {
     static ArrayList<City> cities;
 
     public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
 
-      // TODO remove this comment when all is working find, this just controlls the input
-        //Scanner input = new Scanner(System.in); TODO
-
-        int[] input = genInput();
-
-        N = input[0];//input.nextInt();  TODO      // N = number of cities
-        M = input[1];//input.nextInt();  TODO      // M = number of train routes
-        S = input[2];//input.nextInt();  TODO      // S = city number of the capital
+        N = input.nextInt();        // N = number of cities
+        M = input.nextInt();        // M = number of train routes
+        S = input.nextInt();        // S = city number of the capital
 
         routes = new ArrayList<>(M);    // an ArrayList of all the routes that exist
         cities = new ArrayList<>(N);    // an ArrayList of all the cities
@@ -28,10 +24,10 @@ public class wedding {
 
         // adds all the new routes that are given to the ArrayList routes
         for (int i = 0; i < M; i++) {
-            int f = input[3 + i*3];//input.nextInt(); TODO change this when done
-            int t = input[4 + i*3];//input.nextInt(); TODO
+            int f = input.nextInt();
+            int t = input.nextInt();
             // need to subtract 1, since indexing SHOULD START AT ZERO
-            Route r = new Route(cities.get(f - 1), cities.get(t - 1), input[5 + i*3]);//input.nextInt()); TODO
+            Route r = new Route(cities.get(f - 1), cities.get(t - 1), input.nextInt());
             routes.add(r);
         }
 
@@ -52,32 +48,6 @@ public class wedding {
         }
 
         System.out.print(res);
-    }
-
-    static int[] genInput() {
-      Random rand = new Random();
-
-      int n = rand.nextInt(500) + 1;  // will be N
-      int m = rand.nextInt(6000) + 1; // will be M
-      int s = rand.nextInt(n) + 1;      // will be S
-
-      int[] in = new int[3 + 3*m];
-      in[0] = n;
-      in[1] = m;
-      in[2] = s;
-
-      for (int i = 0; i < m; i++) {
-        in[3 + i*3] = rand.nextInt(n) + 1;  // U
-        in[4 + i*3] = rand.nextInt(n) + 1;  // V
-
-        while (in[4 + i*3] == in[3 + i*3]) {
-          in[4 + i*3] = rand.nextInt(n) + 1;  // V cannot equal U
-        }
-
-        in[5 + i*3] = rand.nextInt(5000) + 1; // D
-      }
-
-      return in;
     }
 }
 
