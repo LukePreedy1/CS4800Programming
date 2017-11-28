@@ -1,6 +1,7 @@
 // For each city, perform the strongly connected component thing
-// If it is all in one component, then add 1 to the total
-// If it splits into another component, then immediately return without adding 1
+// If it is all in one component, then add 1 to the total, and do the rest
+// If it splits into another component, then immediately return without adding 1, then do the rest
+
 import java.util.*;
 
 public class CapitalRelocation {
