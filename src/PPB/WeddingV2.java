@@ -1,120 +1,106 @@
 import java.util.*;
 
-public class wedding {
-    static int N;
-    static int M;
-    static int S;
+public class WeddingV2 {
+  static int N;
+  static int M;
+  static int S;
 
-    static ArrayList<Route> routes;
-    static ArrayList<City> cities;
+  static ArrayList<Route> routes;
+  static City[] cities;
 
-    public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
+  public static void main(String[] args) {
+    Scanner input = new Scanner(System.in);
 
-        N = input.nextInt();        // N = number of cities
-        M = input.nextInt();        // M = number of train routes
-        S = input.nextInt();        // S = city number of the capital
+    N = input.nextInt();        // N = number of cities
+    M = input.nextInt();        // M = number of train routes
+    S = input.nextInt();        // S = city number of the capital
 
-        routes = new ArrayList<>(M);    // an ArrayList of all the routes that exist
+    routes = new ArrayList<>(M);    // an ArrayList of all the routes that exist
+    cities = new City[N];           // an array of all the cities in the kingdom, useful later
 
-        //TODO make cities a binary heap
-
-        //cities = new ArrayList<>(N);    // an ArrayList of all the cities
-
-        for (int i = 0; i < N; i++) {   // adds N cities to the ArrayList
-            cities.add(new City(i));
-        }
-
-        // adds all the new routes that are given to the ArrayList routes
-        for (int i = 0; i < M; i++) {
-            int f = input.nextInt();
-            int t = input.nextInt();
-            // need to subtract 1, since indexing SHOULD START AT ZERO
-            Route r = new Route(cities.get(f - 1), cities.get(t - 1), input.nextInt());
-            routes.add(r);
-        }
-
-        int[] results = new int[N];
-
-        // finds the distance from each city to the capital,
-        // then adds each result to the
-        for (City c : cities) {
-            results[c.num] = c.distanceToCapital(N, S, routes);
-        }
-
-        String res = "";
-
-        // prints the results
-        for (int i = 0; i < N; i++) {
-            res += Integer.toString(results[i]);
-            res += " ";
-        }
-
-        System.out.print(res);
+    for (int i = 0; i < N; i++) {   // adds N cities to the ArrayList
+      cities[i] = new City(i);
     }
+
+    // adds all the new routes that are given to the ArrayList routes
+    for (int i = 0; i < M; i++) {
+      int f = input.nextInt();
+      int t = input.nextInt();
+      // need to subtract 1, since indexing SHOULD START AT ZERO
+      Route r = new Route(cities[f - 1], cities[t - 1], input.nextInt());
+      routes.add(r);
+      cities[f - 1].outRoutes.add(r); // adds the route to the city it leaves
+    }
+
+    // finds the distance from each city to the capital,
+    // then puts the results into the array
+    for (City c : cities) {
+      // initializes the heap to be a copy of the array of cities
+      // will also be fresh for each
+      CityBinaryHeap heap = new CityBinaryHeap(N, cities);
+      System.out.print(c.distanceToCapital(N, S, routes, heap) + " ");
+    }
+  }
 }
 
 class City {
-    int num;    // number of the city
-    int val;
+  int num;    // number of the city
+  ArrayList<Route> outRoutes;
+  int indexInHeap;
 
-    City(int num) {         // can initialize the city with no leaving routes
-        this.num = num;
-        this.val = 0;
+  City(int num) {         // can initialize the city with no leaving routes
+    this.num = num;
+    this.outRoutes = new ArrayList<>(50);
+    this.indexInHeap = num;
+  }
+
+  // returns the distance from the given city to the capital
+  // Will use a Dijkstra to solve
+  // the heap will begin initialized
+  int distanceToCapital(int N, int cap, ArrayList<Route> routes, CityBinaryHeap heap) {
+    // will quickly solve if this city is the capital
+    if (this.num == (cap - 1)) {
+      return 0;
     }
 
-    // returns the distance from the given city to the capital
-    // Will use a modified Bellman-Ford algorithm to solve
-    // Runs in O(cities * routes) time
-    int distanceToCapital(int N, int cap, ArrayList<Route> routes) {
-        if (this.num == (cap - 1)) {  // quickly check if this is the capital
-            return 0;                 // if so, just return 0, skip a few steps
-        }                             // But, still need to subtract by 1, since APPARENTLY ARRAYS DON'T START AT ZERO
+    int[] parents = new int[N]; // an array of all city's parents number, index corresponding to city number
+    Arrays.fill(parents, -1);
 
-        int[] distance = new int[N];
-        //City[] predecessor = new City[N];
+    parents[this.num] = this.num;
 
-        // each element in the array represents a city, and its distance from the given city
-        for (int i = 0; i < N; i++) {
-            distance[i] = 12345;
-            //predecessor[i] = null;
+    heap.updateCost(this.num, 0);
+
+    // while the heap is not empty:
+    while(!heap.isEmpty()) {
+      City c = heap.extractMin();
+      for (Route r : c.outRoutes) {
+        // if the distance from the source on r.to's current path is greater than
+        // a path from c to r.to, then replace
+        if (r.to.indexInHeap != -1
+            && heap.getCost(r.to.num) > heap.getCost(c.num) + r.days) {
+          // updates the cost if it is lower
+          heap.updateCost(r.to.indexInHeap, heap.getCost(c.num) + r.days);
+          parents[r.to.num] = parents[c.num];
         }
-        distance[this.num] = 0; // set the source distance to 0
-
-        for (int i = 0; i < N; i++) {
-            for (Route r : routes) {
-                // if following this route will result in a shorter path to
-                // the end of the path than what it currently has, replace the values
-                if (distance[r.from.num] + r.days < distance[r.to.num] || distance[r.to.num] < 0) {
-                    distance[r.to.num] = distance[r.from.num] + r.days;
-                    //predecessor[r.to.num] = r.from;
-                }
-            }
-        }
-
-        // if the distance is the default large value, it means
-        // that it could not be reached, so we return -1
-        if (distance[cap - 1] == 12345) {
-            return -1;
-        }
-
-        // returns the distance from the capital city
-        // Also, need to subtract 1, again, since indices SHOULD START AT ZERO
-        // HINT HINT
-        return distance[cap - 1];
+      }
     }
+    // if the capital cannot be traced back to the source, return -1
+    if (parents[cap-1] == -1) return -1;
+
+    return heap.getCost(cap-1);
+  }
 }
 
 class Route {
-    City from;   // City the route leaves from
-    City to;     // City the route goes to
-    int days;    // number of days the route takes to travel
+  City from;   // City the route leaves from
+  City to;     // City the route goes to
+  int days;    // number of days the route takes to travel
 
-    Route(City from, City to, int days) {
-        this.from = from;
-        this.to = to;
-        this.days = days;
-    }
+  Route(City from, City to, int days) {
+    this.from = from;
+    this.to = to;
+    this.days = days;
+  }
 }
 
 // represents a binary heap of cities
@@ -128,46 +114,97 @@ class CityBinaryHeap {
     this.costs = new int[N];
   }
 
-  public void initialize() {
-    Arrays.fill(this.costs, 12345); // sets the costs to start at ~infinity
-    this.size = 0;
+  CityBinaryHeap(int N, City[] cities) {
+    for (City c : cities) {
+      c.indexInHeap = c.num;
+    }
+    this.cities = new City[N];
+    System.arraycopy(cities, 0, this.cities, 0, cities.length);
+
+    // costs will not be based on position in heap, but on the number of the city
+    this.costs = new int[N];
+    Arrays.fill(this.costs, 12345);
+    this.size = N;
+  }
+
+  public int getCost(int index) {
+    return this.costs[index];
   }
 
   public boolean isEmpty() {
     return (this.size == 0);
   }
 
+  // given index in heap, new cost, replaces old cost and bubbles accordingly
+  public void updateCost(int index, int newCost) {
+    this.costs[this.cities[index].num] = newCost; // updates the cost
+    // if it has children and one of them is less than the new cost, bubble down
+    if ((index*2 + 1 < this.size) && (newCost > this.costs[this.cities[index*2 + 1].num]
+    || (index*2 + 2 < this.size && newCost > this.costs[this.cities[index*2 + 2].num]))) {
+      this.bubbleDown(index);
+    }
+    else {
+      this.bubbleUp(index);
+    }
+  }
+
+/*
   public void insert(City c) {
     this.cities[size] = c;  // put the given city at the bottom of the heap
     this.size++;            // increment the size
     this.bubbleUp(this.size-1); // will bubble up from the given index
   }
+*/
 
   public void bubbleUp(int index) {
     // if the value at the given index is greater than the city above it, swap
-    if (this.cities[index].val < this.cities[index/2].val) {
-      this.swap(index, index/2);
-      this.bubbleUp(index/2); // recur on the new position of the item to bubble up
+    if (this.costs[this.cities[index].num] < this.costs[this.cities[(index-1)/2].num]) {
+      this.swap(index, (index-1)/2);
+      this.bubbleUp((index-1)/2); // recur on the new position of the item to bubble up
     }
     // otherwise, do nothing
   }
 
+  // bubbles down from the given index until it reaches its sorted position
   public void bubbleDown(int index) {
-    //TODO
+    int leftIndex = index*2 + 1;        // index of the left child of the given index
+    int rightIndex = leftIndex + 1; // index of the right child of the given index
+
+    // do nothing if the given index has no children
+    if (leftIndex >= this.size) return;
+    // else if there is no right child and the left is less than the given, swap and return
+    else if (rightIndex == this.size && this.costs[this.cities[leftIndex].num] < this.costs[this.cities[index].num]) {
+      this.swap(index, leftIndex);
+      return;
+    }
+
+    // is the left child the min?
+    boolean leftIsMin = (this.costs[this.cities[leftIndex].num] < this.costs[this.cities[rightIndex].num]);
+
+    // if the city at leftIndex is greater than the city at rightIndex,
+    // and is greater than the city at index
+    if (leftIsMin && this.costs[this.cities[leftIndex].num] < this.costs[this.cities[index].num]) {
+      this.swap(index, leftIndex);
+      this.bubbleDown(leftIndex);
+    }
+    // else if the city at rightIndex is less than the given index, swap and bubble again
+    else if (this.costs[this.cities[rightIndex].num] < this.costs[this.cities[index].num]) {
+      this.swap(index, rightIndex);
+      this.bubbleDown(rightIndex);
+    }
   }
 
   // swaps the cities and their respective costs at the given two indices
   public void swap(int i1, int i2) {
     if (i1 >= size || i2 >= size) return; // will not run if given indices that are out of bounds
-    
+
     City temp1 = this.cities[i1];
     City temp2 = this.cities[i2];
-    int cost1 = this.costs[i1];
-    int cost2 = this.costs[i2];
     this.cities[i1] = temp2;
     this.cities[i2] = temp1;
-    this.costs[i1] = cost2;
-    this.costs[i2] = cost1;
+    
+    this.cities[i1].indexInHeap = i1;
+    this.cities[i2].indexInHeap = i2;
   }
 
   // since the min will always be at the beginning of the heap, just return [0],
@@ -177,5 +214,7 @@ class CityBinaryHeap {
     this.size--;                        // decrement the size
     this.cities[0] = this.cities[size]; // put the final value at the beginning
     this.bubbleDown(0);                 // bubble down from the beginning
+    result.indexInHeap = -1;
+    return result;
   }
 }
