@@ -14,7 +14,6 @@ public class W3 {
 
     //int[] inputnums = new WeddingInputGen().genInput();
 
-
     N = input.nextInt();
     M = input.nextInt();
     S = input.nextInt();
@@ -34,7 +33,6 @@ public class W3 {
     // adds all the new routes that are given to the ArrayList routes
     //for (int i = 3; i < M*3 + 3; i++) {
     for (int i = 0; i < M; i++) {
-
       int f = input.nextInt();
       int t = input.nextInt();
 
@@ -52,7 +50,8 @@ public class W3 {
 
     CityBinaryHeap heap = new CityBinaryHeap(N, cities);
 
-    int[] resultsInts = cities[S-1].distanceToAll(N, S, heap);
+    // O(M * (log N))
+    int[] resultsInts = cities[S-1].distanceToAll(N, heap);
 
     String results = "";
 
@@ -61,6 +60,7 @@ public class W3 {
       results += " ";
     }
     System.out.print(results);
+
   }
 }
 
@@ -75,19 +75,22 @@ class City {
     this.indexInHeap = num;
   }
 
-  int[] distanceToAll(int N, int cap, CityBinaryHeap heap) {
+  // returns the distance from this city to every other city in the heap.
+  // Uses Dijkstra's algorithm
+  // Runs in O(M * (log N))
+  int[] distanceToAll(int N, CityBinaryHeap heap) {
     int[] parents = new int[N];
     Arrays.fill(parents, -1);
 
-    heap.updateCost(this.num, 0);
+    heap.updateCost(this.num, 0);   // O(log N)
 
     while(!heap.isEmpty()) {
-      City c = heap.extractMin();
-      for (Route r : c.outRoutes) {
+      City c = heap.extractMin();   // O(log N)
+      for (Route r : c.outRoutes) { // O(M), M = number of routes
         if (r.to.indexInHeap != -1 &&
             heap.getCost(r.to.num) > heap.getCost(c.num) + r.days) {
           // updates the cost if it is lower
-          heap.updateCost(r.to.indexInHeap, heap.getCost(c.num) + r.days);
+          heap.updateCost(r.to.indexInHeap, heap.getCost(c.num) + r.days);  // O(log N)
           parents[r.to.num] = parents[c.num];
         }
       }
@@ -136,15 +139,20 @@ class CityBinaryHeap {
     this.size = N;
   }
 
+  // returns the cost of the item at the given index
+  // runs in O(1)
   public int getCost(int index) {
     return this.costs[index];
   }
 
+  // is this heap empty?
+  // Runs in O(1)
   public boolean isEmpty() {
     return (this.size == 0);
   }
 
   // given index in heap, new cost, replaces old cost and bubbles accordingly
+  // Runs in O(log N), N = number of cities
   public void updateCost(int index, int newCost) {
     this.costs[this.cities[index].num] = newCost; // updates the cost
     // if it has children and one of them is less than the new cost, bubble down
@@ -157,6 +165,8 @@ class CityBinaryHeap {
     }
   }
 
+  // bubbles up from the given index until it reaches its sorted position
+  // runs in O(log N), N = number of cities
   public void bubbleUp(int index) {
     if (index > 0 && this.costs[this.cities[index].num] < this.costs[this.cities[(index-1)/2].num]) {
       this.swap(index, (index-1)/2);
@@ -165,6 +175,7 @@ class CityBinaryHeap {
   }
 
   // bubbles down from the given index until it reaches its sorted position
+  // Runs in O(log N), N = number of cities
   public void bubbleDown(int index) {
     int leftIndex = index*2 + 1;        // index of the left child of the given index
     int rightIndex = leftIndex + 1; // index of the right child of the given index
@@ -195,6 +206,7 @@ class CityBinaryHeap {
   }
 
   // swaps the cities and their respective costs at the given two indices
+  // Runs in O(1)
   public void swap(int i1, int i2) {
     if (i1 >= size || i2 >= size) return; // will not run if given indices that are out of bounds
 
@@ -209,6 +221,7 @@ class CityBinaryHeap {
 
   // since the min will always be at the beginning of the heap, just return [0],
   // then bubble down to fill in the blanks
+  // Runs in O(log N), N = number of cities
   public City extractMin() {
     City result = this.cities[0];       // result will be the beginning
     this.size--;                        // decrement the size
