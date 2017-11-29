@@ -2,7 +2,7 @@ import java.util.*;
 
 // TODO will try reversing all the routes, then searching from the capital backwards
 
-public class WeddingV2 {
+public class W3 {
   static int N;
   static int M;
   static int S;
@@ -12,18 +12,18 @@ public class WeddingV2 {
   public static void main(String[] args) {
     Scanner input = new Scanner(System.in);
 
-    int[] inputnums = new WeddingInputGen().genInput();
+    //int[] inputnums = new WeddingInputGen().genInput();
 
-/*
+
     N = input.nextInt();
     M = input.nextInt();
     S = input.nextInt();
-*/
 
+/*
     N = inputnums[0];//input.nextInt();        // N = number of cities
     M = inputnums[1];//input.nextInt();        // M = number of train routes
     S = inputnums[2];//input.nextInt();        // S = city number of the capital
-
+*/
 
     cities = new City[N];           // an array of all the cities in the kingdom, useful later
 
@@ -32,33 +32,33 @@ public class WeddingV2 {
     }
 
     // adds all the new routes that are given to the ArrayList routes
-    for (int i = 3; i < M*3 + 3; i++) {
-    //for (int i = 0; i < M; i++) {
-/*
+    //for (int i = 3; i < M*3 + 3; i++) {
+    for (int i = 0; i < M; i++) {
+
       int f = input.nextInt();
       int t = input.nextInt();
-*/
 
+/*
       int f = inputnums[i];//input.nextInt();
       i++;
       int t = inputnums[i];//input.nextInt();
       i++;
-
+*/
       // need to subtract 1, since indexing SHOULD START AT ZERO
-      //Route r = new Route(cities[f - 1], cities[t - 1], input.nextInt());
-      Route r = new Route(cities[f - 1], cities[t - 1], inputnums[i]);//input.nextInt());
-      cities[f - 1].outRoutes.add(r); // adds the route to the city it leaves
+      Route r = new Route(cities[t - 1], cities[f - 1], input.nextInt());
+      //Route r = new Route(cities[t - 1], cities[f - 1], inputnums[i]);//input.nextInt());
+      cities[t - 1].outRoutes.add(r); // adds the route to the city it leaves
     }
+
+    CityBinaryHeap heap = new CityBinaryHeap(N, cities);
+
+    int[] resultsInts = cities[S-1].distanceToAll(N, S, heap);
 
     String results = "";
 
-    // finds the distance from each city to the capital,
-    // then puts the results into the array
-    for (City c : cities) {
-      // initializes the heap to be a copy of the array of cities
-      // will also be fresh for each
-      CityBinaryHeap heap = new CityBinaryHeap(N, cities);
-      results += c.distanceToCapital(N, S, heap) + " ";
+    for (int i : resultsInts) {
+      results += i;
+      results += " ";
     }
     System.out.print(results);
   }
@@ -75,28 +75,15 @@ class City {
     this.indexInHeap = num;
   }
 
-  // returns the distance from the given city to the capital
-  // Will use a Dijkstra to solve
-  // the heap will begin initialized
-  int distanceToCapital(int N, int cap, CityBinaryHeap heap) {
-    // will quickly solve if this city is the capital
-    if (this.num == (cap - 1)) {
-      return 0;
-    }
-
-    int[] parents = new int[N]; // an array of all city's parents number, index corresponding to city number
+  int[] distanceToAll(int N, int cap, CityBinaryHeap heap) {
+    int[] parents = new int[N];
     Arrays.fill(parents, -1);
-
-    parents[this.num] = this.num;
 
     heap.updateCost(this.num, 0);
 
-    // while the heap is not empty:
     while(!heap.isEmpty()) {
       City c = heap.extractMin();
       for (Route r : c.outRoutes) {
-        // if the distance from the source on r.to's current path is greater than
-        // a path from c to r.to, then replace
         if (r.to.indexInHeap != -1 &&
             heap.getCost(r.to.num) > heap.getCost(c.num) + r.days) {
           // updates the cost if it is lower
@@ -105,10 +92,10 @@ class City {
         }
       }
     }
-    // if the capital cannot be traced back to the source, return -1
-    if (parents[cap-1] == -1) return -1;
-
-    return heap.getCost(cap-1);
+    for (int i = 0; i < N; i++) {
+      if(heap.costs[i] == 999999999) heap.costs[i] = -1;
+    }
+    return heap.costs;
   }
 }
 

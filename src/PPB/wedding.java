@@ -11,9 +11,17 @@ public class wedding {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
-        N = input.nextInt();        // N = number of cities
-        M = input.nextInt();        // M = number of train routes
-        S = input.nextInt();        // S = city number of the capital
+        //int[] inputnums = new WeddingInputGen().genInput();
+
+        N = input.nextInt();
+        M = input.nextInt();
+        S = input.nextInt();
+
+/*
+        N = inputnums[0];//input.nextInt();        // N = number of cities
+        M = inputnums[1];//input.nextInt();        // M = number of train routes
+        S = inputnums[2];//input.nextInt();        // S = city number of the capital
+        */
 
         routes = new ArrayList<>(M);    // an ArrayList of all the routes that exist
         cities = new ArrayList<>(N);    // an ArrayList of all the cities
@@ -23,11 +31,19 @@ public class wedding {
         }
 
         // adds all the new routes that are given to the ArrayList routes
+        //for (int i = 3; i < M*3 + 3; i++) {
         for (int i = 0; i < M; i++) {
+          /*
+            int f = inputnums[i];//input.nextInt();
+            i++;
+            int t = inputnums[i];//input.nextInt();
+            i++;
+            */
             int f = input.nextInt();
             int t = input.nextInt();
             // need to subtract 1, since indexing SHOULD START AT ZERO
             Route r = new Route(cities.get(f - 1), cities.get(t - 1), input.nextInt());
+            //Route r = new Route(cities.get(f - 1), cities.get(t - 1), inputnums[i]);//input.nextInt());
             routes.add(r);
         }
 
@@ -36,18 +52,8 @@ public class wedding {
         // finds the distance from each city to the capital,
         // then adds each result to the
         for (City c : cities) {
-            results[c.num] = c.distanceToCapital(N, S, routes);
+            System.out.print(c.distanceToCapital(N, S, routes) + " ");
         }
-
-        String res = "";
-
-        // prints the results
-        for (int i = 0; i < N; i++) {
-            res += Integer.toString(results[i]);
-            res += " ";
-        }
-
-        System.out.print(res);
     }
 }
 
@@ -71,7 +77,7 @@ class City {
 
         // each element in the array represents a city, and its distance from the given city
         for (int i = 0; i < N; i++) {
-            distance[i] = 12345;
+            distance[i] = 999999999;
             //predecessor[i] = null;
         }
         distance[this.num] = 0; // set the source distance to 0
@@ -89,7 +95,7 @@ class City {
 
         // if the distance is the default large value, it means
         // that it could not be reached, so we return -1
-        if (distance[cap - 1] == 12345) {
+        if (distance[cap - 1] == 999999999) {
             return -1;
         }
 
