@@ -97,8 +97,10 @@ public class CapitalRelocation {
     // while there are still elements left in the stack
     while(stack.empty() == false) {
       int c = (int)stack.pop(); // the number of the next city to DFS through
-      if (cities[c].visited == false) { // if it has not been visited, do this
-        // the stack doesn't matter here, so we'll just make a new one, might get rid of later if causing performance issues
+
+      // if it has not been visited, do this
+      if (cities[c].visited == false) {
+        // the stack doesn't matter here, so we'll just make a new one
         // we do care about the parents, though, since that will determine the SCC's
         cities[c].parent = c;
 
