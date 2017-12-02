@@ -12,17 +12,9 @@ public class W3 {
   public static void main(String[] args) {
     Scanner input = new Scanner(System.in);
 
-    //int[] inputnums = new WeddingInputGen().genInput();
-
     N = input.nextInt();
     M = input.nextInt();
     S = input.nextInt();
-
-/*
-    N = inputnums[0];//input.nextInt();        // N = number of cities
-    M = inputnums[1];//input.nextInt();        // M = number of train routes
-    S = inputnums[2];//input.nextInt();        // S = city number of the capital
-*/
 
     cities = new City[N];           // an array of all the cities in the kingdom, useful later
 
@@ -31,20 +23,12 @@ public class W3 {
     }
 
     // adds all the new routes that are given to the ArrayList routes
-    //for (int i = 3; i < M*3 + 3; i++) {
     for (int i = 0; i < M; i++) {
       int f = input.nextInt();
       int t = input.nextInt();
 
-/*
-      int f = inputnums[i];//input.nextInt();
-      i++;
-      int t = inputnums[i];//input.nextInt();
-      i++;
-*/
       // need to subtract 1, since indexing SHOULD START AT ZERO
       Route r = new Route(cities[t - 1], cities[f - 1], input.nextInt());
-      //Route r = new Route(cities[t - 1], cities[f - 1], inputnums[i]);//input.nextInt());
       cities[t - 1].outRoutes.add(r); // adds the route to the city it leaves
     }
 
@@ -56,11 +40,8 @@ public class W3 {
     String results = "";
 
     for (int i : resultsInts) {
-      results += i;
-      results += " ";
+      System.out.print(i + " ");
     }
-    System.out.print(results);
-
   }
 }
 

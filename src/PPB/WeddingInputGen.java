@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 // generates input of a chosen size for the wedding.java file
 
@@ -10,10 +11,10 @@ class WeddingInputGen {
 
     // Takes input for n, m and s
     int n = input.nextInt();
-    if (n > 5000) n = 5000;
+    if (n > 50000) n = 50000;
 
     int m = input.nextInt();
-    if (m > 60000) m = 60000;
+    if (m > 600000) m = 600000;
 
     int s = input.nextInt();
     if (s > n) s = n;
@@ -45,12 +46,14 @@ class WeddingInputGen {
     Random rand = new Random();
     Scanner input = new Scanner(System.in);
 
+    try(BufferedWriter bw = new BufferedWriter(new FileWriter("input.txt"))){
+
     // Takes input for n, m and s
     int n = input.nextInt();
-    if (n > 5000) n = 5000;
+    if (n > 50000) n = 50000;
 
     int m = input.nextInt();
-    if (m > 60000) m = 60000;
+    if (m > 600000) m = 600000;
 
     int s = input.nextInt();
     if (s > n) s = n;
@@ -76,11 +79,24 @@ class WeddingInputGen {
 
     for (int i = 3; i < 3 + 3*m; ++i) {
       if (i % 3 == 2) {
-        System.out.println(in[i]);
+        //result += in[i];
+        //result += "\n";
+        bw.write(in[i] + "\n");
+        //System.out.println(in[i]);
       }
       else {
-        System.out.print(in[i] + " ");
+        //result += in[i];
+        //result += " ";
+        bw.write(in[i] + " ");
+        //System.out.print(in[i] + " ");
       }
     }
+    //bw.write(result);
+
+    //System.out.println(result);
   }
+  catch(IOException e) {
+    e.printStackTrace();
+  }
+}
 }
