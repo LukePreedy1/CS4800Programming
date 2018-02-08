@@ -6,5 +6,7 @@ length of the route.  The program, when run, will take all that input, then prin
 each city to the capital, with each distance separated by space.  If the city cannot reach the capital,
 will print out -1.
 
+Worth noting that in this problem, the numbers of cities begins at 1, not 0.  Not my choice, its just
+how the problem was designed.  Arrays should start at 0.
 
 The one that is actually working is W3.java, the others were previous, unsuccessful attempts.
