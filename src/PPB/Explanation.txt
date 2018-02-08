@@ -1,0 +1,7 @@
+The problem is: given 3 numbers.  The first, N, is the number of cities, the second, M, is the number of 
+directional routes between cities, the third, S, is the number of the city that is the capital city.
+The program is then given M sets of 3 numbers, the first is the number of the city that the route
+is leaving from, the second is the number of the city that they route is going to, the third is the
+length of the route.  The program, when run, will take all that input, then print out the shortest distance from
+each city to the capital, with each distance separated by space.  The one that is actually working is W3.java,
+the others were previous, unsuccessful attempts.
