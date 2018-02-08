@@ -1,0 +1,9 @@
+Takes in a list of integers.  First, two integers.  The first, N, is the number of cities.
+The second, M, is the number of routes between cities.  Then, takes M pairs of integers.
+In the pairs, the first number is the number of the city the route leaves from.  The second
+is the number of the city the route goes to.  The program will then print out a list of integers
+representing the number of cities that are reachable from each city.  If the city cannot reach
+any other cities, will print -1.
+
+Worth noting that in this program, the given numbers and cities starts at 1, not 0.  Not my choice,
+that's just how the problem was designed.  Everybody knows that arrays should start at 0.
